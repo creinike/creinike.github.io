@@ -1,0 +1,17 @@
+# some information about you
+name: "Carlos Reinike"
+nickname: "Carlos"
+# greeting message before your name. it will default to "Hi! I am" if not provided
+greeting: "Hi, I am"
+image: "assets/images/default-avatar.png"
+# give your some contact information. they will be used in the footer
+contactInfo:
+  email: "johndoe@example.com"
+  phone: "+0123456789"
+
+# some summary about what you do
+summary:
+  - I am a Data Scientist
+  - With a bachelor’s degree in Economics and Business
+  - Check out my portfolio
+  - I work on Data, ML, AI for Business
