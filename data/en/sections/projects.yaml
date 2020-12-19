@@ -22,7 +22,7 @@ buttons:
 # your projects
 projects:
 - name: Kubernetes
-  logo: /images/sections/projects/kubernetes.png
+  logo: static/images/projects/kubernetes.png
   role: Contributor
   timeline: "March 2018 - Present"
   repo: https://github.com/kubernetes/kubernetes # If your project is a public repo on GitHub, then provide this link. it will show star count.
