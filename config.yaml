@@ -1,5 +1,7 @@
 baseURL: https://creinike.github.io
 
+ignoreErrors : ["error-remote-getjson"]
+
 languageCode: en-us
 title: "Carlos's Blog"
 theme: "toha"
@@ -37,4 +39,4 @@ params:
   newsletter:
     enable: true
 
-ignoreErrors : ["error-remote-getjson"]
+  background: "images/background.jpg"
