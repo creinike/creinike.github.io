@@ -1,0 +1,309 @@
+<!doctype html><html><head><title>Momentum Strategy S&P 500</title><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta http-equiv=x-ua-compatible content="ie=edge"><link rel=stylesheet href=/assets/css/bootstrap.min.css><link rel=stylesheet href=/assets/css/layouts/main.css><link rel=stylesheet href=/assets/css/style.css><link rel=stylesheet href=/assets/css/navigators/navbar.css><link href="https://fonts.googleapis.com/css2?family=Muli:wght@300;400;500;600" rel=stylesheet><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css><link rel=icon type=image/png href=/assets/images/favicon.png><link rel=stylesheet href=/assets/css/style.css><meta name=description content="Momentum Strategy S&P 500"><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/styles/atom-one-dark.min.css><link rel=stylesheet href=/assets/css/layouts/single.css><link rel=stylesheet href=/assets/css/navigators/sidebar.css></head><body data-spy=scroll data-target=#TableOfContents data-offset=80><div class="container-fluid bg-dimmed wrapper"><nav class="navbar navbar-expand-xl top-navbar final-navbar shadow"><div class=container><button class="navbar-toggler navbar-light" id=sidebar-toggler type=button onclick=toggleSidebar()>
+<span class=navbar-toggler-icon></span></button>
+<a class=navbar-brand href=/><img src=/assets/images/main-logo.png>Carlos's Blog</a>
+<button class="navbar-toggler navbar-light" id=toc-toggler type=button onclick=toggleTOC()>
+<span class=navbar-toggler-icon></span></button><div class="collapse navbar-collapse lang-selector" id=top-nav-items><ul class="navbar-nav ml-auto"></ul></div></div><img src=/assets/images/main-logo.png class=d-none id=main-logo>
+<img src=/assets/images/inverted-logo.png class=d-none id=inverted-logo></nav><section class=sidebar-section id=sidebar-section><div class=sidebar-holder><div class=sidebar id=sidebar><input type=text placeholder=Search data-search id=search-box><div class=sidebar-tree><ul class=tree id=tree><li id=list-heading><a href=/posts data-filter=all>Posts</a></li><div class=subtree><li><i class="fas fa-minus-circle"></i><a class=active href=/posts/algorithmic-trading-python/>Algorithmic Trading Python</a><ul class=active><li><a href=/posts/algorithmic-trading-python/equal-weight-sp-500/>Equal Weight S&P 500</a></li><li><a class=active href=/posts/algorithmic-trading-python/momentum-strategy/>Momentum Strategy S&P 500</a></li><li><a href=/posts/algorithmic-trading-python/value-strategy/>Value Strategy S&P 500</a></li></ul></li><li><a href=/posts/features/>Project 2</a></li><li><a href=/posts/installation/>Project 3</a></li><li><a href=/posts/writing-posts/>Project 5</a></li><li><a href=/posts/deploy-site/>Project 6</a></li><li><a href=/posts/customizing/>Project 7</a></li><li><a href=/posts/short-codes/>Project 8</a></li></div></ul></div></div></div></section><section class=content-section id=content-section><div class=content><div class="container p-0 read-area"><div class="hero-area col-sm-12" id=hero-area style=background-image:url(https://creinike.github.io/images/posts/writing-posts/analytics.svg)></div><div class=page-content><div class="author-profile ml-auto align-self-lg-center"><img class=rounded-circle src=/images/avatar2.png><h5 class=author-name>Carlos Reinike</h5><p>December 9, 2020</p></div><div class=title><h1>Momentum Strategy S&P 500</h1></div><div class=post-content id=post-content><h1 id=quantitative-momentum-strategy>Quantitative Momentum Strategy</h1><p>&ldquo;Momentum investing&rdquo; means investing in the stocks that have increased in price the most.</p><h2 id=library-imports>Library Imports</h2><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=color:#f92672>import</span> numpy <span style=color:#f92672>as</span> np <span style=color:#75715e>#The Numpy numerical computing library</span>
+<span style=color:#f92672>import</span> pandas <span style=color:#f92672>as</span> pd <span style=color:#75715e>#The Pandas data science library</span>
+<span style=color:#f92672>import</span> requests <span style=color:#75715e>#The requests library for HTTP requests in Python</span>
+<span style=color:#f92672>import</span> xlsxwriter <span style=color:#75715e>#The XlsxWriter libarary for</span>
+<span style=color:#f92672>import</span> math <span style=color:#75715e>#The Python math module</span>
+<span style=color:#f92672>from</span> scipy <span style=color:#f92672>import</span> stats <span style=color:#75715e>#The SciPy stats module</span>
+<span style=color:#f92672>from</span> scipy.stats <span style=color:#f92672>import</span> percentileofscore <span style=color:#66d9ef>as</span> score
+</code></pre></div><h2 id=importing-our-list-of-stocks>Importing Our List of Stocks</h2><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python>stocks <span style=color:#f92672>=</span> pd<span style=color:#f92672>.</span>read_csv(<span style=color:#e6db74>&#39;sp_500_stocks.csv&#39;</span>)
+<span style=color:#f92672>from</span> secrets <span style=color:#f92672>import</span> IEX_CLOUD_API_TOKEN
+</code></pre></div><h2 id=making-our-first-api-call>Making Our First API Call</h2><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python>symbol <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;AAPL&#39;</span>
+api_url <span style=color:#f92672>=</span> f<span style=color:#e6db74>&#39;https://sandbox.iexapis.com/stable/stock/{symbol}/stats?token={IEX_CLOUD_API_TOKEN}&#39;</span>
+data <span style=color:#f92672>=</span> requests<span style=color:#f92672>.</span>get(api_url)<span style=color:#f92672>.</span>json()
+data
+</code></pre></div><pre><code>{'companyName': 'Apple Inc',
+ 'marketcap': 2229290738938,
+ 'week52high': 138.38,
+ 'week52low': 57.07,
+ 'week52change': 0.7756040098878855,
+ 'sharesOutstanding': 17661460248,
+ 'float': 0,
+ 'avg10Volume': 117212549,
+ 'avg30Volume': 110980157,
+ 'day200MovingAvg': 118.16,
+ 'day50MovingAvg': 127.64,
+ 'employees': 0,
+ 'ttmEPS': 3.33,
+ 'ttmDividendRate': 0.8342779339390235,
+ 'dividendYield': 0.006342384272543202,
+ 'nextDividendDate': '0',
+ 'exDividendDate': '2020-10-23',
+ 'nextEarningsDate': '0',
+ 'peRatio': 40.67098281576622,
+ 'beta': 1.2066769092254626,
+ 'maxChangePercent': 50.23609650720246,
+ 'year5ChangePercent': 4.691615897848619,
+ 'year2ChangePercent': 2.686097724309814,
+ 'year1ChangePercent': 0.8081233825710212,
+ 'ytdChangePercent': -0.013032223189693985,
+ 'month6ChangePercent': 0.4515433981547753,
+ 'month3ChangePercent': 0.1302133676150156,
+ 'month1ChangePercent': 0.0740171668697909,
+ 'day30ChangePercent': 0.0748077755423013,
+ 'day5ChangePercent': -0.028665585006375}
+</code></pre><h2 id=parsing-our-api-call>Parsing Our API Call</h2><p>This API call has all the information we need. We can parse it using the same square-bracket notation as in the first project of this course. Here is an example.</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python>data[<span style=color:#e6db74>&#39;year1ChangePercent&#39;</span>]
+</code></pre></div><pre><code>0.8081233825710212
+</code></pre><h2 id=executing-a-batch-api-call--building-our-dataframe>Executing A Batch API Call & Building Our DataFrame</h2><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=color:#75715e># Function sourced from</span>
+<span style=color:#75715e># https://stackoverflow.com/questions/312443/how-do-you-split-a-list-into-evenly-sized-chunks</span>
+<span style=color:#66d9ef>def</span> <span style=color:#a6e22e>chunks</span>(lst, n):
+    <span style=color:#e6db74>&#34;&#34;&#34;Yield successive n-sized chunks from lst.&#34;&#34;&#34;</span>
+    <span style=color:#66d9ef>for</span> i <span style=color:#f92672>in</span> range(<span style=color:#ae81ff>0</span>, len(lst), n):
+        <span style=color:#66d9ef>yield</span> lst[i:i <span style=color:#f92672>+</span> n]   
+
+symbol_groups <span style=color:#f92672>=</span> list(chunks(stocks[<span style=color:#e6db74>&#39;Ticker&#39;</span>], <span style=color:#ae81ff>100</span>))
+symbol_strings <span style=color:#f92672>=</span> []
+<span style=color:#66d9ef>for</span> i <span style=color:#f92672>in</span> range(<span style=color:#ae81ff>0</span>, len(symbol_groups)):
+    symbol_strings<span style=color:#f92672>.</span>append(<span style=color:#e6db74>&#39;,&#39;</span><span style=color:#f92672>.</span>join(symbol_groups[i]))
+<span style=color:#75715e>#     print(symbol_strings[i])</span>
+
+my_columns <span style=color:#f92672>=</span> [<span style=color:#e6db74>&#39;Ticker&#39;</span>, <span style=color:#e6db74>&#39;Price&#39;</span>, <span style=color:#e6db74>&#39;One-Year Price Return&#39;</span>, <span style=color:#e6db74>&#39;Number of Shares to Buy&#39;</span>]
+</code></pre></div><p>Now we need to create a blank DataFrame and add our data to the data frame one-by-one.</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python>final_dataframe <span style=color:#f92672>=</span> pd<span style=color:#f92672>.</span>DataFrame(columns <span style=color:#f92672>=</span> my_columns)
+
+<span style=color:#66d9ef>for</span> symbol_string <span style=color:#f92672>in</span> symbol_strings:
+<span style=color:#75715e>#     print(symbol_strings)</span>
+    batch_api_call_url <span style=color:#f92672>=</span> f<span style=color:#e6db74>&#39;https://sandbox.iexapis.com/stable/stock/market/batch/?types=stats,quote&amp;symbols={symbol_string}&amp;token={IEX_CLOUD_API_TOKEN}&#39;</span>
+    data <span style=color:#f92672>=</span> requests<span style=color:#f92672>.</span>get(batch_api_call_url)<span style=color:#f92672>.</span>json()
+    <span style=color:#66d9ef>for</span> symbol <span style=color:#f92672>in</span> symbol_string<span style=color:#f92672>.</span>split(<span style=color:#e6db74>&#39;,&#39;</span>):
+        final_dataframe <span style=color:#f92672>=</span> final_dataframe<span style=color:#f92672>.</span>append(
+                                        pd<span style=color:#f92672>.</span>Series([symbol,
+                                                   data[symbol][<span style=color:#e6db74>&#39;quote&#39;</span>][<span style=color:#e6db74>&#39;latestPrice&#39;</span>],
+                                                   data[symbol][<span style=color:#e6db74>&#39;stats&#39;</span>][<span style=color:#e6db74>&#39;year1ChangePercent&#39;</span>],
+                                                   <span style=color:#e6db74>&#39;N/A&#39;</span>
+                                                   ],
+                                                  index <span style=color:#f92672>=</span> my_columns),
+                                        ignore_index <span style=color:#f92672>=</span> True)
+
+
+final_dataframe
+</code></pre></div><pre><code>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+</code></pre><p></p><h2 id=removing-low-momentum-stocks>Removing Low-Momentum Stocks</h2><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python>final_dataframe<span style=color:#f92672>.</span>sort_values(<span style=color:#e6db74>&#39;One-Year Price Return&#39;</span>, ascending <span style=color:#f92672>=</span> False, inplace <span style=color:#f92672>=</span> True)
+final_dataframe <span style=color:#f92672>=</span> final_dataframe[:<span style=color:#ae81ff>51</span>]
+final_dataframe<span style=color:#f92672>.</span>reset_index(drop <span style=color:#f92672>=</span> True, inplace <span style=color:#f92672>=</span> True)
+final_dataframe
+</code></pre></div><pre><code>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+</code></pre><p></p><h2 id=calculating-the-number-of-shares-to-buy>Calculating the Number of Shares to Buy</h2><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=color:#66d9ef>def</span> <span style=color:#a6e22e>portfolio_input</span>():
+    <span style=color:#66d9ef>global</span> portfolio_size
+    portfolio_size <span style=color:#f92672>=</span> input(<span style=color:#e6db74>&#34;Enter the value of your portfolio:&#34;</span>)
+
+    <span style=color:#66d9ef>try</span>:
+        val <span style=color:#f92672>=</span> float(portfolio_size)
+    <span style=color:#66d9ef>except</span> <span style=color:#a6e22e>ValueError</span>:
+        <span style=color:#66d9ef>print</span>(<span style=color:#e6db74>&#34;That&#39;s not a number! </span><span style=color:#ae81ff>\n</span><span style=color:#e6db74> Try again:&#34;</span>)
+        portfolio_size <span style=color:#f92672>=</span> input(<span style=color:#e6db74>&#34;Enter the value of your portfolio:&#34;</span>)
+
+portfolio_input()
+<span style=color:#66d9ef>print</span>(portfolio_size)
+</code></pre></div><pre><code>Enter the value of your portfolio:1000000
+1000000
+</code></pre><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python>position_size <span style=color:#f92672>=</span> float(portfolio_size) <span style=color:#f92672>/</span> len(final_dataframe<span style=color:#f92672>.</span>index)
+<span style=color:#66d9ef>for</span> i <span style=color:#f92672>in</span> range(<span style=color:#ae81ff>0</span>, len(final_dataframe[<span style=color:#e6db74>&#39;Ticker&#39;</span>])):
+    final_dataframe<span style=color:#f92672>.</span>loc[i, <span style=color:#e6db74>&#39;Number of Shares to Buy&#39;</span>] <span style=color:#f92672>=</span> math<span style=color:#f92672>.</span>floor(position_size <span style=color:#f92672>/</span> final_dataframe[<span style=color:#e6db74>&#39;Price&#39;</span>][i])
+final_dataframe
+</code></pre></div><pre><code>C:\Users\omen\anaconda3\lib\site-packages\pandas\core\indexing.py:1765: SettingWithCopyWarning:
+A value is trying to be set on a copy of a slice from a DataFrame.
+Try using .loc[row_indexer,col_indexer] = value instead
+
+See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+  isetter(loc, value)
+</code></pre><pre><code>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+</code></pre><p></p><h2 id=building-a-better-and-more-realistic-momentum-strategy>Building a Better (and More Realistic) Momentum Strategy</h2><p>Real-world quantitative investment firms differentiate between &ldquo;high quality&rdquo; and &ldquo;low quality&rdquo; momentum stocks:</p><ul><li>High-quality momentum stocks show &ldquo;slow and steady&rdquo; outperformance over long periods of time</li><li>Low-quality momentum stocks might not show any momentum for a long time, and then surge upwards.</li></ul><p>The reason why high-quality momentum stocks are preferred is because low-quality momentum can often be cause by short-term news that is unlikely to be repeated in the future (such as an FDA approval for a biotechnology company).</p><p>To identify high-quality momentum, we&rsquo;re going to build a strategy that selects stocks from the highest percentiles of:</p><ul><li>1-month price returns</li><li>3-month price returns</li><li>6-month price returns</li><li>1-year price returns</li></ul><p>Let&rsquo;s start by building our DataFrame. You&rsquo;ll notice that I use the abbreviation <code>hqm</code> often. It stands for <code>high-quality momentum</code>.</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python>hqm_columns <span style=color:#f92672>=</span> [
+                <span style=color:#e6db74>&#39;Ticker&#39;</span>,
+                <span style=color:#e6db74>&#39;Price&#39;</span>,
+                <span style=color:#e6db74>&#39;Number of Shares to Buy&#39;</span>,
+                <span style=color:#e6db74>&#39;One-Year Price Return&#39;</span>,
+                <span style=color:#e6db74>&#39;One-Year Return Percentile&#39;</span>,
+                <span style=color:#e6db74>&#39;Six-Month Price Return&#39;</span>,
+                <span style=color:#e6db74>&#39;Six-Month Return Percentile&#39;</span>,
+                <span style=color:#e6db74>&#39;Three-Month Price Return&#39;</span>,
+                <span style=color:#e6db74>&#39;Three-Month Return Percentile&#39;</span>,
+                <span style=color:#e6db74>&#39;One-Month Price Return&#39;</span>,
+                <span style=color:#e6db74>&#39;One-Month Return Percentile&#39;</span>,
+                <span style=color:#e6db74>&#39;HQM Score&#39;</span>
+                ]
+
+hqm_dataframe <span style=color:#f92672>=</span> pd<span style=color:#f92672>.</span>DataFrame(columns <span style=color:#f92672>=</span> hqm_columns)
+
+<span style=color:#66d9ef>for</span> symbol_string <span style=color:#f92672>in</span> symbol_strings:
+<span style=color:#75715e>#     print(symbol_strings)</span>
+    batch_api_call_url <span style=color:#f92672>=</span> f<span style=color:#e6db74>&#39;https://sandbox.iexapis.com/stable/stock/market/batch/?types=stats,quote&amp;symbols={symbol_string}&amp;token={IEX_CLOUD_API_TOKEN}&#39;</span>
+    data <span style=color:#f92672>=</span> requests<span style=color:#f92672>.</span>get(batch_api_call_url)<span style=color:#f92672>.</span>json()
+    <span style=color:#66d9ef>for</span> symbol <span style=color:#f92672>in</span> symbol_string<span style=color:#f92672>.</span>split(<span style=color:#e6db74>&#39;,&#39;</span>):
+        hqm_dataframe <span style=color:#f92672>=</span> hqm_dataframe<span style=color:#f92672>.</span>append(
+                                        pd<span style=color:#f92672>.</span>Series([symbol,
+                                                   data[symbol][<span style=color:#e6db74>&#39;quote&#39;</span>][<span style=color:#e6db74>&#39;latestPrice&#39;</span>],
+                                                   <span style=color:#e6db74>&#39;N/A&#39;</span>,
+                                                   data[symbol][<span style=color:#e6db74>&#39;stats&#39;</span>][<span style=color:#e6db74>&#39;year1ChangePercent&#39;</span>],
+                                                   <span style=color:#e6db74>&#39;N/A&#39;</span>,
+                                                   data[symbol][<span style=color:#e6db74>&#39;stats&#39;</span>][<span style=color:#e6db74>&#39;month6ChangePercent&#39;</span>],
+                                                   <span style=color:#e6db74>&#39;N/A&#39;</span>,
+                                                   data[symbol][<span style=color:#e6db74>&#39;stats&#39;</span>][<span style=color:#e6db74>&#39;month3ChangePercent&#39;</span>],
+                                                   <span style=color:#e6db74>&#39;N/A&#39;</span>,
+                                                   data[symbol][<span style=color:#e6db74>&#39;stats&#39;</span>][<span style=color:#e6db74>&#39;month1ChangePercent&#39;</span>],
+                                                   <span style=color:#e6db74>&#39;N/A&#39;</span>,
+                                                   <span style=color:#e6db74>&#39;N/A&#39;</span>
+                                                   ],
+                                                  index <span style=color:#f92672>=</span> hqm_columns),
+                                        ignore_index <span style=color:#f92672>=</span> True)
+
+hqm_dataframe<span style=color:#f92672>.</span>columns
+hqm_dataframe
+</code></pre></div><pre><code>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+</code></pre><p></p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python>hqm_dataframe<span style=color:#f92672>.</span>fillna(<span style=color:#ae81ff>0</span>, inplace<span style=color:#f92672>=</span>True)
+</code></pre></div><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python>hqm_dataframe<span style=color:#f92672>.</span>isnull()<span style=color:#f92672>.</span>sum()
+</code></pre></div><pre><code>Ticker                           0
+Price                            0
+Number of Shares to Buy          0
+One-Year Price Return            0
+One-Year Return Percentile       0
+Six-Month Price Return           0
+Six-Month Return Percentile      0
+Three-Month Price Return         0
+Three-Month Return Percentile    0
+One-Month Price Return           0
+One-Month Return Percentile      0
+HQM Score                        0
+dtype: int64
+</code></pre><h2 id=calculating-momentum-percentiles>Calculating Momentum Percentiles</h2><p>We now need to calculate momentum percentile scores for every stock in the universe. More specifically, we need to calculate percentile scores for the following metrics for every stock:</p><ul><li><code>One-Year Price Return</code></li><li><code>Six-Month Price Return</code></li><li><code>Three-Month Price Return</code></li><li><code>One-Month Price Return</code></li></ul><p>Here&rsquo;s how we&rsquo;ll do this:</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python>time_periods <span style=color:#f92672>=</span> [
+                <span style=color:#e6db74>&#39;One-Year&#39;</span>,
+                <span style=color:#e6db74>&#39;Six-Month&#39;</span>,
+                <span style=color:#e6db74>&#39;Three-Month&#39;</span>,
+                <span style=color:#e6db74>&#39;One-Month&#39;</span>
+                ]
+
+<span style=color:#66d9ef>for</span> row <span style=color:#f92672>in</span> hqm_dataframe<span style=color:#f92672>.</span>index:
+    <span style=color:#66d9ef>for</span> time_period <span style=color:#f92672>in</span> time_periods:
+        hqm_dataframe<span style=color:#f92672>.</span>loc[row, f<span style=color:#e6db74>&#39;{time_period} Return Percentile&#39;</span>] <span style=color:#f92672>=</span> stats<span style=color:#f92672>.</span>percentileofscore(hqm_dataframe[f<span style=color:#e6db74>&#39;{time_period} Price Return&#39;</span>], hqm_dataframe<span style=color:#f92672>.</span>loc[row, f<span style=color:#e6db74>&#39;{time_period} Price Return&#39;</span>])<span style=color:#f92672>/</span><span style=color:#ae81ff>100</span>
+
+<span style=color:#75715e># Print each percentile score to make sure it was calculated properly</span>
+<span style=color:#e6db74>&#39;&#39;&#39;
+</span><span style=color:#e6db74>for time_period in time_periods:
+</span><span style=color:#e6db74>    print(hqm_dataframe[f&#39;{time_period} Return Percentile&#39;])
+</span><span style=color:#e6db74>&#39;&#39;&#39;</span>
+<span style=color:#75715e>#Print the entire DataFrame    </span>
+hqm_dataframe
+</code></pre></div><pre><code>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+</code></pre><p></p><h2 id=calculating-the-hqm-score>Calculating the HQM Score</h2><p>We&rsquo;ll now calculate our <code>HQM Score</code>, which is the high-quality momentum score that we&rsquo;ll use to filter for stocks in this investing strategy.</p><p>The <code>HQM Score</code> will be the arithmetic mean of the 4 momentum percentile scores that we calculated in the last section.</p><p>To calculate arithmetic mean, we will use the <code>mean</code> function from Python&rsquo;s built-in <code>statistics</code> module.</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=color:#f92672>from</span> statistics <span style=color:#f92672>import</span> mean
+
+<span style=color:#66d9ef>for</span> row <span style=color:#f92672>in</span> hqm_dataframe<span style=color:#f92672>.</span>index:
+    momentum_percentiles <span style=color:#f92672>=</span> []
+    <span style=color:#66d9ef>for</span> time_period <span style=color:#f92672>in</span> time_periods:
+        momentum_percentiles<span style=color:#f92672>.</span>append(hqm_dataframe<span style=color:#f92672>.</span>loc[row, f<span style=color:#e6db74>&#39;{time_period} Return Percentile&#39;</span>])
+    hqm_dataframe<span style=color:#f92672>.</span>loc[row, <span style=color:#e6db74>&#39;HQM Score&#39;</span>] <span style=color:#f92672>=</span> mean(momentum_percentiles)
+</code></pre></div><h2 id=selecting-the-50-best-momentum-stocks>Selecting the 50 Best Momentum Stocks</h2><p>As before, we can identify the 50 best momentum stocks in our universe by sorting the DataFrame on the <code>HQM Score</code> column and dropping all but the top 50 entries.</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python>hqm_dataframe<span style=color:#f92672>.</span>sort_values(by <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;HQM Score&#39;</span>, ascending <span style=color:#f92672>=</span> False)
+hqm_dataframe <span style=color:#f92672>=</span> hqm_dataframe[:<span style=color:#ae81ff>51</span>]
+</code></pre></div><h2 id=calculating-the-number-of-shares-to-buy-1>Calculating the Number of Shares to Buy</h2><p>We&rsquo;ll use the <code>portfolio_input</code> function that we created earlier to accept our portfolio size. Then we will use similar logic in a <code>for</code> loop to calculate the number of shares to buy for each stock in our investment universe.</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python>portfolio_input()
+</code></pre></div><pre><code>Enter the value of your portfolio:1000000
+</code></pre><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python>position_size <span style=color:#f92672>=</span> float(portfolio_size) <span style=color:#f92672>/</span> len(hqm_dataframe<span style=color:#f92672>.</span>index)
+<span style=color:#66d9ef>for</span> i <span style=color:#f92672>in</span> range(<span style=color:#ae81ff>0</span>, len(hqm_dataframe[<span style=color:#e6db74>&#39;Ticker&#39;</span>])<span style=color:#f92672>-</span><span style=color:#ae81ff>1</span>):
+    hqm_dataframe<span style=color:#f92672>.</span>loc[i, <span style=color:#e6db74>&#39;Number of Shares to Buy&#39;</span>] <span style=color:#f92672>=</span> math<span style=color:#f92672>.</span>floor(position_size <span style=color:#f92672>/</span> hqm_dataframe[<span style=color:#e6db74>&#39;Price&#39;</span>][i])
+hqm_dataframe
+</code></pre></div><pre><code>C:\Users\omen\anaconda3\lib\site-packages\pandas\core\indexing.py:1765: SettingWithCopyWarning:
+A value is trying to be set on a copy of a slice from a DataFrame.
+Try using .loc[row_indexer,col_indexer] = value instead
+
+See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+  isetter(loc, value)
+</code></pre><pre><code>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+</code></pre><p></p><h2 id=formatting-our-excel-output>Formatting Our Excel Output</h2><p>We will be using the XlsxWriter library for Python to create nicely-formatted Excel files.</p><p>XlsxWriter is an excellent package and offers tons of customization. However, the tradeoff for this is that the library can seem very complicated to new users. Accordingly, this section will be fairly long because I want to do a good job of explaining how XlsxWriter works.</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python>writer <span style=color:#f92672>=</span> pd<span style=color:#f92672>.</span>ExcelWriter(<span style=color:#e6db74>&#39;momentum_strategy.xlsx&#39;</span>, engine<span style=color:#f92672>=</span><span style=color:#e6db74>&#39;xlsxwriter&#39;</span>)
+hqm_dataframe<span style=color:#f92672>.</span>to_excel(writer, sheet_name<span style=color:#f92672>=</span><span style=color:#e6db74>&#39;Momentum Strategy&#39;</span>, index <span style=color:#f92672>=</span> False)
+</code></pre></div><h2 id=creating-the-formats-well-need-for-our-xlsx-file>Creating the Formats We&rsquo;ll Need For Our .xlsx File</h2><p>You&rsquo;ll recall from our first project that formats include colors, fonts, and also symbols like % and $. We&rsquo;ll need four main formats for our Excel document:</p><ul><li>String format for tickers</li><li>$XX.XX format for stock prices</li><li>$XX,XXX format for market capitalization</li><li>Integer format for the number of shares to purchase</li></ul><p>Since we already built our formats in the last section of this course, I&rsquo;ve included them below for you. Run this code cell before proceeding.</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python>background_color <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;#0a0a23&#39;</span>
+font_color <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;#ffffff&#39;</span>
+
+string_template <span style=color:#f92672>=</span> writer<span style=color:#f92672>.</span>book<span style=color:#f92672>.</span>add_format(
+        {
+            <span style=color:#e6db74>&#39;font_color&#39;</span>: font_color,
+            <span style=color:#e6db74>&#39;bg_color&#39;</span>: background_color,
+            <span style=color:#e6db74>&#39;border&#39;</span>: <span style=color:#ae81ff>1</span>
+        }
+    )
+
+dollar_template <span style=color:#f92672>=</span> writer<span style=color:#f92672>.</span>book<span style=color:#f92672>.</span>add_format(
+        {
+            <span style=color:#e6db74>&#39;num_format&#39;</span>:<span style=color:#e6db74>&#39;$0.00&#39;</span>,
+            <span style=color:#e6db74>&#39;font_color&#39;</span>: font_color,
+            <span style=color:#e6db74>&#39;bg_color&#39;</span>: background_color,
+            <span style=color:#e6db74>&#39;border&#39;</span>: <span style=color:#ae81ff>1</span>
+        }
+    )
+
+integer_template <span style=color:#f92672>=</span> writer<span style=color:#f92672>.</span>book<span style=color:#f92672>.</span>add_format(
+        {
+            <span style=color:#e6db74>&#39;num_format&#39;</span>:<span style=color:#e6db74>&#39;0&#39;</span>,
+            <span style=color:#e6db74>&#39;font_color&#39;</span>: font_color,
+            <span style=color:#e6db74>&#39;bg_color&#39;</span>: background_color,
+            <span style=color:#e6db74>&#39;border&#39;</span>: <span style=color:#ae81ff>1</span>
+        }
+    )
+
+percent_template <span style=color:#f92672>=</span> writer<span style=color:#f92672>.</span>book<span style=color:#f92672>.</span>add_format(
+        {
+            <span style=color:#e6db74>&#39;num_format&#39;</span>:<span style=color:#e6db74>&#39;0.0%&#39;</span>,
+            <span style=color:#e6db74>&#39;font_color&#39;</span>: font_color,
+            <span style=color:#e6db74>&#39;bg_color&#39;</span>: background_color,
+            <span style=color:#e6db74>&#39;border&#39;</span>: <span style=color:#ae81ff>1</span>
+        }
+    )
+</code></pre></div><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python>column_formats <span style=color:#f92672>=</span> {
+                    <span style=color:#e6db74>&#39;A&#39;</span>: [<span style=color:#e6db74>&#39;Ticker&#39;</span>, string_template],
+                    <span style=color:#e6db74>&#39;B&#39;</span>: [<span style=color:#e6db74>&#39;Price&#39;</span>, dollar_template],
+                    <span style=color:#e6db74>&#39;C&#39;</span>: [<span style=color:#e6db74>&#39;Number of Shares to Buy&#39;</span>, integer_template],
+                    <span style=color:#e6db74>&#39;D&#39;</span>: [<span style=color:#e6db74>&#39;One-Year Price Return&#39;</span>, percent_template],
+                    <span style=color:#e6db74>&#39;E&#39;</span>: [<span style=color:#e6db74>&#39;One-Year Return Percentile&#39;</span>, percent_template],
+                    <span style=color:#e6db74>&#39;F&#39;</span>: [<span style=color:#e6db74>&#39;Six-Month Price Return&#39;</span>, percent_template],
+                    <span style=color:#e6db74>&#39;G&#39;</span>: [<span style=color:#e6db74>&#39;Six-Month Return Percentile&#39;</span>, percent_template],
+                    <span style=color:#e6db74>&#39;H&#39;</span>: [<span style=color:#e6db74>&#39;Three-Month Price Return&#39;</span>, percent_template],
+                    <span style=color:#e6db74>&#39;I&#39;</span>: [<span style=color:#e6db74>&#39;Three-Month Return Percentile&#39;</span>, percent_template],
+                    <span style=color:#e6db74>&#39;J&#39;</span>: [<span style=color:#e6db74>&#39;One-Month Price Return&#39;</span>, percent_template],
+                    <span style=color:#e6db74>&#39;K&#39;</span>: [<span style=color:#e6db74>&#39;One-Month Return Percentile&#39;</span>, percent_template],
+                    <span style=color:#e6db74>&#39;L&#39;</span>: [<span style=color:#e6db74>&#39;HQM Score&#39;</span>, integer_template]
+                    }
+
+<span style=color:#66d9ef>for</span> column <span style=color:#f92672>in</span> column_formats<span style=color:#f92672>.</span>keys():
+    writer<span style=color:#f92672>.</span>sheets[<span style=color:#e6db74>&#39;Momentum Strategy&#39;</span>]<span style=color:#f92672>.</span>set_column(f<span style=color:#e6db74>&#39;{column}:{column}&#39;</span>, <span style=color:#ae81ff>20</span>, column_formats[column][<span style=color:#ae81ff>1</span>])
+    writer<span style=color:#f92672>.</span>sheets[<span style=color:#e6db74>&#39;Momentum Strategy&#39;</span>]<span style=color:#f92672>.</span>write(f<span style=color:#e6db74>&#39;{column}1&#39;</span>, column_formats[column][<span style=color:#ae81ff>0</span>], string_template)
+</code></pre></div><h2 id=saving-our-excel-output>Saving Our Excel Output</h2><p>As before, saving our Excel output is very easy:</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python>writer<span style=color:#f92672>.</span>save()
+</code></pre></div><img src=/images/posts/configuration/momentum_strategy.png></div><div class=btn-improve-page><a href=https://github.com/hugo-toha/hugo-toha.github.io/edit/master/content/posts/Algorithmic-Trading-Python/Momentum%20Strategy.md><i class="fas fa-code-branch"></i>Improve this page</a></div><hr><div class="row next-prev-navigator"><div class="col-md-6 previous-article"><a href=/posts/algorithmic-trading-python/equal-weight-sp-500/ class="btn btn-outline-info"><span><i class="fas fa-chevron-circle-left"></i>Prev</span><br><span>Equal Weight S&P 500</span></a></div><div class="col-md-6 next-article"><a href=/posts/algorithmic-trading-python/value-strategy/ class="btn btn-outline-info"><span>Next <i class="fas fa-chevron-circle-right"></i></span><br><span>Value Strategy S&P 500</span></a></div></div><hr></div></div></div></section><section class=toc-section id=toc-section><div class=toc-holder><h5 class="text-center pl-3">Table of Contents</h5><hr><div class=toc><nav id=TableOfContents><ul><li><a href=#library-imports>Library Imports</a></li><li><a href=#importing-our-list-of-stocks>Importing Our List of Stocks</a></li><li><a href=#making-our-first-api-call>Making Our First API Call</a></li><li><a href=#parsing-our-api-call>Parsing Our API Call</a></li><li><a href=#executing-a-batch-api-call--building-our-dataframe>Executing A Batch API Call & Building Our DataFrame</a></li><li><a href=#removing-low-momentum-stocks>Removing Low-Momentum Stocks</a></li><li><a href=#calculating-the-number-of-shares-to-buy>Calculating the Number of Shares to Buy</a></li><li><a href=#building-a-better-and-more-realistic-momentum-strategy>Building a Better (and More Realistic) Momentum Strategy</a></li><li><a href=#calculating-momentum-percentiles>Calculating Momentum Percentiles</a></li><li><a href=#calculating-the-hqm-score>Calculating the HQM Score</a></li><li><a href=#selecting-the-50-best-momentum-stocks>Selecting the 50 Best Momentum Stocks</a></li><li><a href=#calculating-the-number-of-shares-to-buy-1>Calculating the Number of Shares to Buy</a></li><li><a href=#formatting-our-excel-output>Formatting Our Excel Output</a></li><li><a href=#creating-the-formats-well-need-for-our-xlsx-file>Creating the Formats We&rsquo;ll Need For Our .xlsx File</a></li><li><a href=#saving-our-excel-output>Saving Our Excel Output</a></li></ul></nav></div></div></section></div><footer class="container-fluid text-center align-content-center footer pb-2"><div class="container pt-5"><div class="row text-left"><div class="col-md-4 col-sm-12"><h5>Navigation</h5><ul><li class=nav-item><a class=smooth-scroll href=#about>About</a></li><li class=nav-item><a class=smooth-scroll href=#recent-posts>Recent Posts</a></li></ul></div><div class="col-md-4 col-sm-12"><h5>Contact me:</h5><ul><li><span>Email:</span> <span>johndoe@example.com</span></li><li><span>Phone:</span> <span>+0123456789</span></li></ul></div><div class="col-md-4 col-sm-12"><p>Stay up to date with email notification</p><form><div class=form-group><input type=email class=form-control id=exampleInputEmail1 aria-describedby=emailHelp placeholder="Enter email">
+<small id=emailHelp class="form-text text-muted">We'll never share your email with anyone else.</small></div><button type=submit class="btn btn-info">Submit</button></form></div></div></div><hr><div class=container><div class="row text-left"><div class=col-md-4><a id=theme href=https://github.com/hossainemruz/toha target=#><img src=/assets/images/inverted-logo.png>
+Toha</a></div><div class="col-md-4 text-center">© 2020 Copyright.</div><div class="col-md-4 text-right"><a id=hugo href=https://gohugo.io/>Powered by
+<img src=/assets/images/hugo-logo-wide.svg alt="Hugo Logo" height=18></a></div></div></div></footer><script src=/assets/js/jquery-3.4.1.min.js></script><script src=/assets/js/popper.min.js></script><script src=/assets/js/bootstrap.min.js></script><script src=/assets/js/navbar.js></script><script src=/assets/js/main.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js></script><script src=/assets/js/single.js></script><script>hljs.initHighlightingOnLoad();</script></body></html>
