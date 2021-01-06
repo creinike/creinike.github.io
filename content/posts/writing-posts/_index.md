@@ -1,8 +1,8 @@
 ---
-title: Writing Posts
+title: Project 5
 menu:
   sidebar:
-    name: Writing Posts
-    identifier: writing-post
+    name: Project 5
+    identifier: Project 5
     weight: 200
 ---

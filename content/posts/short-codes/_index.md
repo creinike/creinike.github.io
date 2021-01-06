@@ -1,8 +1,8 @@
 ---
-title: Short Codes
+title: Project 8
 menu:
   sidebar:
-    name: Short Codes
-    identifier: short-codes
+    name: Project 8
+    identifier: Project 8
     weight: 600
 ---

@@ -1,8 +1,8 @@
 ---
-title: Deploy Site
+title: Project 6
 menu:
   sidebar:
-    name: Deploy Site
-    identifier: deploy-site
+    name: Project 6
+    identifier: Project 6
     weight: 300
 ---
